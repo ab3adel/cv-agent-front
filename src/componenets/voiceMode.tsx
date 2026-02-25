@@ -20,6 +20,7 @@ export default function VoiceMode() {
   const textController = useRef<AbortController | null>(null)
   const audioController = useRef<AbortController | null>(null)
   const isRecordingRef = useRef(false);
+  const recordingRef = useRef(false);
   const transcriptRef = useRef('')
 
   const streamRef = useRef<MediaStream | null>(null);
@@ -100,7 +101,7 @@ export default function VoiceMode() {
             // CHECK REF INSTEAD OF STATE
             if (transcriptRef.current.trim()) {
               console.log('🤫 Silence detected. Sending:', transcriptRef.current);
-              sendTextToBackend(transcriptRef.current,recording);
+              sendTextToBackend(transcriptRef.current, recordingRef.current);
 
 
               // Optional: Clear transcript after sending
@@ -425,6 +426,7 @@ export default function VoiceMode() {
  const unlock =async ()=>{
   setRecording(prev => {
     const next = !prev;
+    recordingRef.current = next;
 
     if (next) {
       initAudioOnce();
@@ -448,6 +450,10 @@ export default function VoiceMode() {
   useEffect(() => {
     if (!userUUID.current) userUUID.current = crypto.randomUUID()
   }, [])
+
+  useEffect(() => {
+    recordingRef.current = recording;
+  }, [recording]);
 
 useEffect(() => {
   if (!transcript) return;
